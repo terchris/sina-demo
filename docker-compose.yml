@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  order-service:
+    build:
+      context: ./OrderService
+      dockerfile: Dockerfile
+    ports:
+      - "5002:5002"
+    environment:
+      - ASPNETCORE_URLS=http://+:5002
+      - PRODUCT_SERVICE_URL=http://product-service:5004
+      - INVENTORY_SERVICE_URL=http://inventory-service:5001
+      - PAYMENT_SERVICE_URL=http://payment-service:5003
+    depends_on:
+      - product-service
+      - inventory-service
+      - payment-service
+    networks:
+      - microservices-network
+
+  product-service:
+    build:
+      context: ./ProductService
+      dockerfile: Dockerfile
+    ports:
+      - "5004:5004"
+    environment:
+      - ASPNETCORE_URLS=http://+:5004
+    networks:
+      - microservices-network
+
+  inventory-service:
+    build:
+      context: ./InventoryService
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - ASPNETCORE_URLS=http://+:5001
+    networks:
+      - microservices-network
+
+  payment-service:
+    build:
+      context: ./PaymentService
+      dockerfile: Dockerfile
+    ports:
+      - "5003:5003"
+    environment:
+      - ASPNETCORE_URLS=http://+:5003
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
